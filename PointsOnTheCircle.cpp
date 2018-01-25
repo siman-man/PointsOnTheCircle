@@ -15,6 +15,15 @@ int mapping[MAX_N];
 
 int N;
 
+unsigned long long xor128() {
+    static unsigned long long rx = 123456789, ry = 362436069, rz = 521288629, rw = 88675123;
+    unsigned long long rt = (rx ^ (rx << 11));
+    rx = ry;
+    ry = rz;
+    rz = rw;
+    return (rw = (rw ^ (rw >> 19)) ^ (rt ^ (rt >> 8)));
+}
+
 class PointsOnTheCircle {
 public:
     void init(vector<int> matrix) {
@@ -46,8 +55,32 @@ public:
 
     vector<int> permute(vector<int> matrix) {
         init(matrix);
+        reconnectLine();
         fprintf(stderr, "Total length = %f\n", calcScore());
         return createAnswer();
+    }
+
+    void reconnectLine() {
+        int bestScore = calcScore();
+
+        for (int t = 0; t < 1000; t++) {
+            int i = xor128() % N;
+            int j = xor128() % N;
+            swapMapping(i, j);
+            double score = calcScore();
+
+            if (bestScore > score) {
+                bestScore = score;
+            } else {
+                swapMapping(i, j);
+            }
+        }
+    }
+
+    void swapMapping(int i, int j) {
+        int t = mapping[i];
+        mapping[i] = mapping[j];
+        mapping[j] = t;
     }
 
     double calcScore() {
@@ -56,7 +89,6 @@ public:
         for (int i = 0; i < N; i++) {
             for (int j = i + 1; j < N; j++) {
                 if (connect[i][j]) {
-                    fprintf(stderr, "%d -> %d\n", i, j);
                     length += dist[mapping[i]][mapping[j]];
                 }
             }
