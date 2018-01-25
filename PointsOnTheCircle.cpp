@@ -12,6 +12,8 @@ const int MAX_N = 200;
 
 bool connect[MAX_N][MAX_N];
 double dist[MAX_N][MAX_N];
+int edge[MAX_N][MAX_N];
+int edgeCount[MAX_N];
 int mapping[MAX_N];
 
 int N;
@@ -44,6 +46,9 @@ public:
     void init(vector<int> matrix) {
         N = (int) sqrt(matrix.size());
 
+        memset(edge, -1, sizeof(edge));
+        memset(edgeCount, 0, sizeof(edgeCount));
+
         fprintf(stderr, "N = %d\n", N);
 
         for (int i = 0; i < N; i++) {
@@ -60,11 +65,19 @@ public:
         for (int i = 0; i < N; i++) {
             connect[i][i] = false;
             mapping[i] = i;
+            int nc = 0;
 
             for (int j = 0; j < N; j++) {
                 int z = i * N + j;
                 connect[i][j] = matrix[z];
+
+                if (connect[i][j]) {
+                    edge[i][nc] = j;
+                    nc++;
+                }
             }
+
+            edgeCount[i] = nc;
         }
     }
 
@@ -136,11 +149,10 @@ public:
 
     double calcScoreSub(int i) {
         double length = 0.0;
+        int v = mapping[i];
 
-        for (int j = 0; j < N; j++) {
-            if (connect[i][j]) {
-                length += dist[mapping[i]][mapping[j]] * connect[i][j];
-            }
+        for (int j = 0; j < edgeCount[i]; j++) {
+            length += dist[v][mapping[edge[i][j]]];
         }
 
         return length;
