@@ -87,14 +87,20 @@ public:
         double remainTime = 0.0;
         int tryCount = 0;
 
+        double diffScore = 0.0;
+
         while (currentTime < TIME_LIMIT) {
             currentTime = getTime(startCycle);
             remainTime = (TIME_LIMIT - currentTime) / TIME_LIMIT;
 
             int i = xor128() % N;
             int j = xor128() % N;
+
+            diffScore = calcScoreSub(i) + calcScoreSub(j);
             swapMapping(i, j);
-            double score = calcScore();
+            diffScore -= calcScoreSub(i) + calcScoreSub(j);
+
+            double score = bestScore - diffScore;
 
             if (bestScore > score) {
                 bestScore = score;
@@ -116,13 +122,25 @@ public:
         mapping[j] = t;
     }
 
+    double calcScoreSub(int i) {
+        double length = 0.0;
+
+        for (int j = 0; j < N; j++) {
+            if (connect[i][j]) {
+                length += dist[mapping[i]][mapping[j]] * connect[i][j];
+            }
+        }
+
+        return length;
+    }
+
     double calcScore() {
         double length = 0.0;
 
         for (int i = 0; i < N; i++) {
             for (int j = i + 1; j < N; j++) {
                 if (connect[i][j]) {
-                    length += dist[mapping[i]][mapping[j]];
+                    length += dist[mapping[i]][mapping[j]] * connect[i][j];
                 }
             }
         }
