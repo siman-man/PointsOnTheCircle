@@ -93,13 +93,16 @@ public:
         double k = 0.5;
 
         double diffScore = 0.0;
+        int i, j;
 
         while (currentTime < TIME_LIMIT) {
             currentTime = getTime(startCycle);
             remainTime = (TIME_LIMIT - currentTime) / TIME_LIMIT;
 
-            int i = xor128() % N;
-            int j = xor128() % N;
+            do {
+                i = xor128() % N;
+                j = xor128() % N;
+            } while (i == j);
 
             diffScore = calcScoreSub(i) + calcScoreSub(j);
             swapMapping(i, j);
