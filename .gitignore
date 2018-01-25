@@ -1,0 +1,14 @@
+*.jar
+PointsOnTheCircle
+/data
+*.java
+/seed
+*.txt
+Rakefile
+*.png
+parse.rb
+.idea
+cmake-build-debug
+output
+rate.rb
+*.in
