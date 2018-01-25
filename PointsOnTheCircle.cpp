@@ -9,7 +9,9 @@ using namespace std;
 
 const int MAX_N = 200;
 
+bool connect[MAX_N][MAX_N];
 double dist[MAX_N][MAX_N];
+int mapping[MAX_N];
 
 int N;
 
@@ -18,24 +20,58 @@ public:
     void init(vector<int> matrix) {
         N = (int) sqrt(matrix.size());
 
+        fprintf(stderr, "N = %d\n", N);
+
         for (int i = 0; i < N; i++) {
             dist[i][i] = 0.0;
 
             for (int j = 1; j < N; j++) {
-                double r = j * N / 360.0;
-                double l = 2 - 2 * cos(r / 180);
-                dist[i][(i+j)%N] = l;
-                dist[(i+j)%N][i] = l;
+                double r = j * 360.0 / N;
+                double l = sqrt(2 - 2 * cos(r * M_PI / 180.0));
+                dist[i][(i + j) % N] = l;
+                dist[(i + j) % N][i] = l;
+            }
+        }
+
+        for (int i = 0; i < N; i++) {
+            connect[i][i] = false;
+            mapping[i] = i;
+
+            for (int j = 0; j < N; j++) {
+                int z = i * N + j;
+                connect[i][j] = matrix[z];
             }
         }
     }
 
     vector<int> permute(vector<int> matrix) {
         init(matrix);
-        vector<int> ret(N);
-        for (int i = 0; i < N; ++i) {
-            ret[i] = N - i - 1;
+        fprintf(stderr, "Total length = %f\n", calcScore());
+        return createAnswer();
+    }
+
+    double calcScore() {
+        double length = 0.0;
+
+        for (int i = 0; i < N; i++) {
+            for (int j = i + 1; j < N; j++) {
+                if (connect[i][j]) {
+                    fprintf(stderr, "%d -> %d\n", i, j);
+                    length += dist[mapping[i]][mapping[j]];
+                }
+            }
         }
+
+        return length;
+    }
+
+    vector<int> createAnswer() {
+        vector<int> ret;
+
+        for (int i = 0; i < N; i++) {
+            ret.push_back(mapping[i]);
+        }
+
         return ret;
     }
 };
