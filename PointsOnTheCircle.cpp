@@ -6,6 +6,7 @@
 #include <string.h>
 
 using namespace std;
+typedef long long ll;
 
 const int MAX_N = 200;
 
@@ -14,6 +15,10 @@ double dist[MAX_N][MAX_N];
 int mapping[MAX_N];
 
 int N;
+ll startCycle;
+
+double TIME_LIMIT = 10.0;
+const ll CYCLE_PER_SEC = 2700000000;
 
 unsigned long long xor128() {
     static unsigned long long rx = 123456789, ry = 362436069, rz = 521288629, rw = 88675123;
@@ -22,6 +27,16 @@ unsigned long long xor128() {
     ry = rz;
     rz = rw;
     return (rw = (rw ^ (rw >> 19)) ^ (rt ^ (rt >> 8)));
+}
+
+unsigned long long int getCycle() {
+    unsigned int low, high;
+    __asm__ volatile ("rdtsc" : "=a" (low), "=d" (high));
+    return ((unsigned long long int) low) | ((unsigned long long int) high << 32);
+}
+
+double getTime(unsigned long long int begin_cycle) {
+    return (double) (getCycle() - begin_cycle) / CYCLE_PER_SEC;
 }
 
 class PointsOnTheCircle {
@@ -54,16 +69,28 @@ public:
     }
 
     vector<int> permute(vector<int> matrix) {
+        startCycle = getCycle();
+
         init(matrix);
+
         reconnectLine();
-        fprintf(stderr, "Total length = %f\n", calcScore());
+
         return createAnswer();
     }
 
     void reconnectLine() {
-        int bestScore = calcScore();
+        double bestScore = calcScore();
+        int bestMapping[MAX_N];
+        memcpy(bestMapping, mapping, sizeof(mapping));
 
-        for (int t = 0; t < 1000; t++) {
+        double currentTime = getTime(startCycle);
+        double remainTime = 0.0;
+        int tryCount = 0;
+
+        while (currentTime < TIME_LIMIT) {
+            currentTime = getTime(startCycle);
+            remainTime = (TIME_LIMIT - currentTime) / TIME_LIMIT;
+
             int i = xor128() % N;
             int j = xor128() % N;
             swapMapping(i, j);
@@ -71,10 +98,16 @@ public:
 
             if (bestScore > score) {
                 bestScore = score;
+                memcpy(bestMapping, mapping, sizeof(mapping));
             } else {
                 swapMapping(i, j);
             }
+
+            tryCount++;
         }
+
+        memcpy(mapping, bestMapping, sizeof(bestMapping));
+        fprintf(stderr, "bestScore = %f, tryCount = %d\n", bestScore, tryCount);
     }
 
     void swapMapping(int i, int j) {
@@ -98,10 +131,10 @@ public:
     }
 
     vector<int> createAnswer() {
-        vector<int> ret;
+        vector<int> ret(N);
 
         for (int i = 0; i < N; i++) {
-            ret.push_back(mapping[i]);
+            ret[mapping[i]] = i;
         }
 
         return ret;
@@ -116,6 +149,7 @@ void getVector(vector <T> &v) {
 }
 
 int main() {
+    TIME_LIMIT = 2.0;
     PointsOnTheCircle pc;
     int M;
     cin >> M;
@@ -124,7 +158,8 @@ int main() {
 
     vector<int> ret = pc.permute(matrix);
     cout << ret.size() << endl;
-    for (int i = 0; i < (int) ret.size(); ++i)
+    for (int i = 0; i < (int) ret.size(); ++i) {
         cout << ret[i] << endl;
+    }
     cout.flush();
 }
