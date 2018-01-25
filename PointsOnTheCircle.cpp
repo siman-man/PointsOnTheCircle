@@ -83,9 +83,14 @@ public:
         int bestMapping[MAX_N];
         memcpy(bestMapping, mapping, sizeof(mapping));
 
+        double currentScore = bestScore;
+
         double currentTime = getTime(startCycle);
         double remainTime = 0.0;
         int tryCount = 0;
+
+        int R = 500000;
+        double k = 0.5;
 
         double diffScore = 0.0;
 
@@ -100,11 +105,15 @@ public:
             swapMapping(i, j);
             diffScore -= calcScoreSub(i) + calcScoreSub(j);
 
-            double score = bestScore - diffScore;
+            double score = currentScore - diffScore;
 
-            if (bestScore > score) {
-                bestScore = score;
-                memcpy(bestMapping, mapping, sizeof(mapping));
+            if (currentScore > score || (diffScore > -20 && xor128() % R < R * exp(diffScore / (k * sqrt(remainTime))))) {
+                currentScore = score;
+
+                if (bestScore > score) {
+                    bestScore = score;
+                    memcpy(bestMapping, mapping, sizeof(mapping));
+                }
             } else {
                 swapMapping(i, j);
             }
