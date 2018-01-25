@@ -13,3 +13,8 @@ Your task is to find a permutation of the labels for the points which will minim
 Implementation
 Your code should implement a single method permute(vector <int> m). m[i*N+j] = 1 if the points with labels i and j have to be connected with a line, and 0 otherwise. You can deduce N as sqrt(length(m)). The matrix represented by m is symmetrical (m[i*N+j] = m[j*N+i] for all i, j), with diagonal elements m[i*N+i] = 0. 
 
+
+## 制約
+
+制限時間 10s
+メモリ制限 1GB
