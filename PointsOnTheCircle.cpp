@@ -121,13 +121,11 @@ public:
             swapMapping(i, j);
             diffScore -= calcScoreSub(i) + calcScoreSub(j);
 
-            double score = currentScore - diffScore;
+            if (diffScore > 0 || (diffScore > -20 && xor128() % R < R * exp(diffScore / (k * sqrt(remainTime))))) {
+                currentScore -= diffScore;
 
-            if (currentScore > score || (diffScore > -20 && xor128() % R < R * exp(diffScore / (k * sqrt(remainTime))))) {
-                currentScore = score;
-
-                if (bestScore > score) {
-                    bestScore = score;
+                if (bestScore > currentScore) {
+                    bestScore = currentScore;
                     memcpy(bestMapping, mapping, sizeof(mapping));
                 }
             } else {
