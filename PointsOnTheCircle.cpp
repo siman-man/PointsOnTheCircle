@@ -183,11 +183,7 @@ public:
 // -------8<------- end of solution submitted to the website -------8<-------
 
 template<class T>
-void getVector(vector <T> &v) {
-    for (int i = 0; i < v.size(); ++i)
-        cin >> v[i];
-}
-
+void getVector(vector <T> &v) { for (int i = 0; i < v.size(); ++i) { cin >> v[i]; } }
 int main() {
     TIME_LIMIT = 2.0;
     PointsOnTheCircle pc;
@@ -195,7 +191,6 @@ int main() {
     cin >> M;
     vector<int> matrix(M);
     getVector(matrix);
-
     vector<int> ret = pc.permute(matrix);
     cout << ret.size() << endl;
     for (int i = 0; i < (int) ret.size(); ++i) {
